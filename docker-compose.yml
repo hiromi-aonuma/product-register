@@ -1,0 +1,29 @@
+version: '3'
+
+volumes: # DBのファイルシステムをホスト側につくる
+  db-data:
+
+services:
+  web: # serviceの名前
+    build: . # buildの情報を指定（今回はカレントディレクトリのcontext, keyをimageにすることも可能）
+    ports:
+      - '3000:3000'
+    volumes: # 相対PATHで指定
+      - '.:/product-register'
+    environment:
+      - 'DATABASE_PASSWORD=postgres'
+    tty: true # -t に相当 入力をpretyにする
+    stdin_open: true # -i に相当 入力をインタラクティブにする
+    depends_on: # 先にdbをつくる
+      - db
+    links:
+      - db
+
+
+  db:
+    image: postgres
+    volumes:
+      - 'db-data:/var/lib/postgresql/data'
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
